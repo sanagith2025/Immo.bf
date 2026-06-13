@@ -5,8 +5,8 @@ from django.http import HttpResponse
 def home(request):
     return HttpResponse("""
         <h1>Bienvenue sur Immo.bf !</h1>
-        <p>Votre site Django est en ligne avec succès ! 🎉</p>
-        <p><a href="/admin/">Accéder à l'administration</a></p>
+        <p>Votre site Django est en ligne avec succès !</p>
+        <p><a href="/admin/">Acceder a l'administration</a></p>
     """)
 
 def health_check(request):
