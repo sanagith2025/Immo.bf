@@ -129,3 +129,5 @@ CREATE_INITIAL_SUPERUSER = {
 # Redirection après connexion
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/connexion/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
