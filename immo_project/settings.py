@@ -1,17 +1,24 @@
+"""
+Django settings for immo_project project.
+"""
+
 from pathlib import Path
 import os
-import dj_database_url
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Récupérer la clé secrète depuis les variables d'environnement
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-key-pour-developpement-uniquement')
 
-# DEBUG doit être False sur Render
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-key-for-dev')
 
-# Autoriser uniquement les domaines valides
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+ALLOWED_HOSTS = ['immo-bf.onrender.com', 'localhost', '127.0.0.1', '.onrender.com']
+
+
+# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -20,12 +27,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'immobilier',
+    'immobilier',  # Votre application immobilière
+    'create_initial_superuser',  # Création auto du superutilisateur
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # 👈 AJOUTER pour fichiers statiques
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Pour les fichiers statiques
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -54,7 +62,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'immo_project.wsgi.application'
 
-# Configuration base de données : PostgreSQL sur Render, SQLite en local
+
+# Database - SQLite (pour Render, fonctionne mais les données ne persistent pas)
+# Pour PostgreSQL décommentez les lignes plus bas
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -62,37 +73,59 @@ DATABASES = {
     }
 }
 
-# Utiliser PostgreSQL si DATABASE_URL est présent (Render)
-database_url = os.getenv('DATABASE_URL')
-if database_url:
-    DATABASES['default'] = dj_database_url.config(default=database_url, conn_max_age=600)
+# Si vous voulez utiliser PostgreSQL sur Render (recommandé), décommentez ceci :
+# import dj_database_url
+# DATABASES = {
+#     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+# }
 
-AUTH_USER_MODEL = 'immobilier.Utilisateur'
 
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
-LANGUAGE_CODE = 'fr-fr'
-TIME_ZONE = 'Africa/Ouagadougou'
+
+# Internationalization
+LANGUAGE_CODE = 'fr-fr'  # Français
+TIME_ZONE = 'Africa/Ouagadougou'  # Heure du Burkina Faso
 USE_I18N = True
 USE_TZ = True
 
-# Fichiers statiques
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Fichiers média
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# Media files (uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# WhiteNoise configuration (pour servir les fichiers statiques)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = '/connexion/'
+# Configuration du superutilisateur automatique (pour Render)
+CREATE_INITIAL_SUPERUSER = {
+    'username': 'admin',
+    'email': 'admin@immo.bf',
+    'password': 'AdminBurkina2026!',  # Changez ce mot de passe après première connexion
+}
+
+# Redirection après connexion
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/connexion/'

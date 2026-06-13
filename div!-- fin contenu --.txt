@@ -1,0 +1,9 @@
+</div><!-- fin contenu -->
+    </div><!-- fin main -->
+    <div id="footer">
+        <img src="images/logo.png" alt="Logo">
+        &copy; <?= date('Y') ?> Gestion de Commandes - Tous droits réservés
+    </div>
+</div><!-- fin wrapper -->
+</body>
+</html>
