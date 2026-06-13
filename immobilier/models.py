@@ -1,7 +1,6 @@
-from django.db import models
+﻿from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
-
 
 class UtilisateurManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -32,19 +31,32 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, verbose_name="Email")
     nom = models.CharField(max_length=100, verbose_name="Nom")
     prenom = models.CharField(max_length=100, verbose_name="Prénom")
-    telephone = models.CharField(max_length=20, blank=True, verbose_name="Téléphone")
+    telephone = models.CharField(max_length=20, blank=True, null=True, default='', verbose_name="Téléphone")
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='client', verbose_name="Rôle")
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_inscription = models.DateTimeField(default=timezone.now)
 
-    # Agent affecté au client (relation client -> agent)
     agent_affecte = models.ForeignKey(
         'self', null=True, blank=True,
         on_delete=models.SET_NULL,
         related_name='clients_affectes',
         limit_choices_to={'role': 'agent'},
         verbose_name="Agent affecté"
+    )
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='immobilier_utilisateurs',
+        blank=True,
+        verbose_name='groups'
+    )
+    
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='immobilier_utilisateurs_permissions',
+        blank=True,
+        verbose_name='user permissions'
     )
 
     objects = UtilisateurManager()
@@ -140,8 +152,7 @@ class Propriete(models.Model):
 
     @property
     def photo_principale(self):
-        photo = self.photos.first()
-        return photo if photo else None
+        return self.photos.first()
 
 
 class PhotoPropriete(models.Model):
