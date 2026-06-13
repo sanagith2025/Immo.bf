@@ -1,0 +1,35 @@
+# Environnement virtuel
+venv/
+env/
+.venv/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+
+# Base de données
+db.sqlite3
+db.sqlite3-journal
+
+# Fichiers de configuration locaux
+.env
+*.log
+local_settings.py
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Médias
+media/
+
+# Fichiers statiques collectés
+staticfiles/
