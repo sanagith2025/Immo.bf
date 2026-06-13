@@ -1,11 +1,21 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.http import HttpResponse
 
-def home(request):
-    return HttpResponse("Hello World! Django fonctionne!")
+# Vue temporaire pour la page d'accueil
+def accueil(request):
+    return HttpResponse("""
+        <h1>Bienvenue sur Immo.bf !</h1>
+        <p>Votre site Django est en ligne avec succès ! 🎉</p>
+        <p><a href="/admin/">Accéder à l'administration</a></p>
+    """)
+
+def health_check(request):
+    return HttpResponse("OK")
 
 urlpatterns = [
-    path('', home),
-    path('admin/', admin.site.urls),
+    path('', accueil, name='accueil'),
+    path('health-check/', health_check, name='health_check'),
+    path('admin/', admin.site.urls, name='admin'),
+    # path('', include('immobilier.urls')),  # Décommentez quand vos URLs sont prêtes
 ]
