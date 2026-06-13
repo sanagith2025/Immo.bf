@@ -1,0 +1,25 @@
+<div class="card-propriete">
+  <div class="img-wrap">
+    {% if propriete.photo_principale %}
+      <img src="{{ propriete.photo_principale.image.url }}" alt="{{ propriete.titre }}">
+    {% else %}
+      <div class="img-placeholder">🏠</div>
+    {% endif %}
+    <span class="badge-option {% if propriete.option == 'vente' %}badge-vente{% endif %}">
+      {{ propriete.get_option_display }}
+    </span>
+  </div>
+  <div class="card-body">
+    <h3>{{ propriete.titre }}</h3>
+    <p class="zone">{{ propriete.zone_geographique }}</p>
+    <p class="prix">{{ propriete.prix|floatformat:0 }} FCFA</p>
+    <div class="tags">
+      <span class="tag">{{ propriete.get_type_bien_display }}</span>
+      <span class="tag">{{ propriete.get_usage_display }}</span>
+      <span class="tag">{{ propriete.superficie }} m²</span>
+    </div>
+    <div class="card-footer-actions">
+      <a href="{% url 'detail_propriete' propriete.pk %}" class="btn btn-vert btn-sm">Voir détails</a>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Gestion des visites{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="section-titre"><h3>📅 Demandes de visite ({{ visites|length }})</h3></div>
+  {% if visites %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Propriété</th><th>Client</th><th>Date souhaitée</th><th>Demandé le</th><th>Statut</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for v in visites %}
+        <tr>
+          <td>{{ v.propriete.titre }}</td>
+          <td>{{ v.client.nom_complet }}</td>
+          <td>{{ v.date_souhaitee|default:"—" }}</td>
+          <td>{{ v.date_demande|date:"d/m/Y" }}</td>
+          <td><span class="badge badge-{{ v.statut }}">{{ v.get_statut_display }}</span></td>
+          <td>
+            {% if v.statut == 'en_attente' %}
+              <a href="{% url 'agent_traiter_visite' v.pk %}" class="btn btn-or btn-sm">Traiter</a>
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="vide"><div class="icon">📅</div><p>Aucune demande de visite.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Connexion{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="form-card">
+  <h2>🔐 Connexion</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>{{ form.username.label }}</label>
+      {{ form.username }}
+    </div>
+    <div class="form-group">
+      <label>{{ form.password.label }}</label>
+      {{ form.password }}
+    </div>
+    {% if form.non_field_errors %}
+      <p class="form-erreur">{{ form.non_field_errors.0 }}</p>
+    {% endif %}
+    <button type="submit" class="btn btn-vert btn-full">Se connecter</button>
+    <p class="lien-bas">Pas encore de compte ? <a href="{% url 'inscription' %}">S'inscrire</a></p>
+  </form>
+</div>
+</div>
+{% endblock %}

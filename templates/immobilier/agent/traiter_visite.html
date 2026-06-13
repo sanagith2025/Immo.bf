@@ -1,0 +1,24 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Traiter la visite{% endblock %}
+{% block content %}
+<div class="container section">
+<div class="form-card">
+  <h2>📅 Traiter la demande de visite</h2>
+  <div style="background:#f0faf4;padding:1rem;border-radius:6px;margin-bottom:1.5rem;">
+    <strong>Propriété :</strong> {{ visite.propriete.titre }}<br>
+    <strong>Client :</strong> {{ visite.client.nom_complet }}<br>
+    <strong>Date souhaitée :</strong> {{ visite.date_souhaitee|default:"Non précisée" }}<br>
+    {% if visite.message %}<strong>Message :</strong> {{ visite.message }}{% endif %}
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group"><label>Décision</label>{{ form.statut }}</div>
+    <div class="form-group"><label>Commentaire pour le client</label>{{ form.commentaire_agent }}</div>
+    <div style="display:flex;gap:1rem;">
+      <button type="submit" class="btn btn-vert">Enregistrer</button>
+      <a href="{% url 'agent_visites' %}" class="btn btn-gris">Annuler</a>
+    </div>
+  </form>
+</div>
+</div>
+{% endblock %}

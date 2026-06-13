@@ -1,0 +1,28 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Affecter un client{% endblock %}
+{% block content %}
+<div class="container section">
+<div class="form-card">
+  <h2>👤 Affecter {{ client.nom_complet }} à un agent</h2>
+  <p style="color:#555;margin-bottom:1.5rem;">Agent actuel : <strong>{{ client.agent_affecte.nom_complet|default:"Aucun" }}</strong></p>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>Choisir un agent</label>
+      <select name="agent_id">
+        <option value="">— Retirer l'affectation —</option>
+        {% for agent in agents %}
+          <option value="{{ agent.pk }}" {% if client.agent_affecte == agent %}selected{% endif %}>
+            {{ agent.nom_complet }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="display:flex;gap:1rem;">
+      <button type="submit" class="btn btn-vert">Confirmer</button>
+      <a href="{% url 'manager_utilisateurs' %}" class="btn btn-gris">Annuler</a>
+    </div>
+  </form>
+</div>
+</div>
+{% endblock %}

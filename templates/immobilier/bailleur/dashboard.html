@@ -1,0 +1,51 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Espace Bailleur{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <h2>🏠 Espace Bailleur</h2>
+    <p>Bienvenue {{ user.nom_complet }} — Gérez vos annonces</p>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val">{{ stats.total }}</div><div class="stat-label">Total</div></div>
+    <div class="stat-card or"><div class="stat-val">{{ stats.en_attente }}</div><div class="stat-label">En attente</div></div>
+    <div class="stat-card"><div class="stat-val">{{ stats.publiees }}</div><div class="stat-label">Publiées</div></div>
+    <div class="stat-card rouge"><div class="stat-val">{{ stats.retirees }}</div><div class="stat-label">Retirées</div></div>
+  </div>
+  <div class="section-titre">
+    <h3>Mes annonces</h3>
+    <a href="{% url 'bailleur_ajouter' %}" class="btn btn-vert">+ Déposer une annonce</a>
+  </div>
+  {% if proprietes %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Titre</th><th>Type</th><th>Option</th><th>Prix (FCFA)</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for p in proprietes %}
+        <tr>
+          <td><strong>{{ p.titre }}</strong><br><small>{{ p.zone_geographique }}</small></td>
+          <td>{{ p.get_type_bien_display }}</td>
+          <td>{{ p.get_option_display }}</td>
+          <td>{{ p.prix|floatformat:0 }}</td>
+          <td><span class="badge badge-{{ p.statut }}">{{ p.get_statut_display }}</span></td>
+          <td>
+            <div class="actions">
+              {% if p.statut == 'publiee' %}<a href="{% url 'detail_propriete' p.pk %}" class="btn btn-vert btn-sm">👁️</a>{% endif %}
+              <a href="{% url 'bailleur_modifier' p.pk %}" class="btn btn-or btn-sm">✏️</a>
+              <form method="post" action="{% url 'bailleur_supprimer' p.pk %}" style="display:inline;" onsubmit="return confirm('Supprimer ?')">
+                {% csrf_token %}<button type="submit" class="btn btn-rouge btn-sm">🗑️</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="vide"><div class="icon">📋</div><p>Aucune annonce.</p>
+    <a href="{% url 'bailleur_ajouter' %}" class="btn btn-vert" style="margin-top:1rem;">Déposer une annonce</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

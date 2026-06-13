@@ -1,0 +1,45 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}{{ titre }}{% endblock %}
+{% block content %}
+<div class="container section">
+<div class="form-card" style="max-width:700px;">
+  <h2>🏠 {{ titre }}</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+      <label>{{ form.titre.label }}</label>{{ form.titre }}
+      {% if form.titre.errors %}<p class="form-erreur">{{ form.titre.errors.0 }}</p>{% endif %}
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>{{ form.type_bien.label }}</label>{{ form.type_bien }}</div>
+      <div class="form-group"><label>{{ form.usage.label }}</label>{{ form.usage }}</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>{{ form.option.label }}</label>{{ form.option }}</div>
+      <div class="form-group"><label>{{ form.zone_geographique.label }}</label>{{ form.zone_geographique }}</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>{{ form.superficie.label }}</label>{{ form.superficie }}</div>
+      <div class="form-group"><label>{{ form.prix.label }}</label>{{ form.prix }}</div>
+    </div>
+    <div class="form-group"><label>{{ form.description.label }}</label>{{ form.description }}</div>
+    <div class="form-group"><label>Photo</label>{{ photo_form.image }}</div>
+    <div class="form-group"><label>Légende</label>{{ photo_form.legende }}</div>
+    {% if propriete and propriete.photos.all %}
+    <div style="margin-bottom:1rem;">
+      <p style="font-weight:600;">Photos actuelles :</p>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem;">
+        {% for ph in propriete.photos.all %}
+          <img src="{{ ph.image.url }}" style="height:80px;width:100px;object-fit:cover;border-radius:4px;">
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+    <div style="display:flex;gap:1rem;margin-top:1rem;">
+      <button type="submit" class="btn btn-vert">💾 Enregistrer</button>
+      <a href="javascript:history.back()" class="btn btn-gris">Annuler</a>
+    </div>
+  </form>
+</div>
+</div>
+{% endblock %}

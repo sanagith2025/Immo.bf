@@ -1,0 +1,75 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}{{ propriete.titre }}{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <a href="{% url 'accueil' %}" style="color:var(--vert-clair);">← Retour aux annonces</a>
+
+  <div class="detail-wrap">
+    <!-- PHOTOS -->
+    <div class="detail-photos">
+      {% if propriete.photos.all %}
+        {% with photos=propriete.photos.all %}
+          <img id="main-photo" src="{{ photos.0.image.url }}" alt="{{ propriete.titre }}">
+          {% if photos|length > 1 %}
+          <div class="galerie-thumbs">
+            {% for photo in photos %}
+              <img src="{{ photo.image.url }}" alt="" onclick="document.getElementById('main-photo').src=this.src">
+            {% endfor %}
+          </div>
+          {% endif %}
+        {% endwith %}
+      {% else %}
+        <div style="height:360px;background:#e8f5ec;display:flex;align-items:center;justify-content:center;font-size:5rem;border-radius:8px;">🏠</div>
+      {% endif %}
+    </div>
+
+    <!-- INFOS -->
+    <div class="detail-info">
+      <span class="badge {% if propriete.option == 'vente' %}badge-retiree{% else %}badge-publiee{% endif %}">
+        {{ propriete.get_option_display }}
+      </span>
+      <h2>{{ propriete.titre }}</h2>
+      <div class="detail-prix">{{ propriete.prix|floatformat:0 }} FCFA</div>
+
+      <div class="detail-specs">
+        <div class="spec-row"><span>Type</span><span>{{ propriete.get_type_bien_display }}</span></div>
+        <div class="spec-row"><span>Usage</span><span>{{ propriete.get_usage_display }}</span></div>
+        <div class="spec-row"><span>Superficie</span><span>{{ propriete.superficie }} m²</span></div>
+        <div class="spec-row"><span>Zone</span><span>{{ propriete.zone_geographique }}</span></div>
+        <div class="spec-row"><span>Publié le</span><span>{{ propriete.date_creation|date:"d/m/Y" }}</span></div>
+        {% if afficher_contact %}
+          <div class="spec-row"><span>Propriétaire</span><span>{{ propriete.bailleur.nom_complet }}</span></div>
+        {% endif %}
+      </div>
+
+      <div style="margin-top:1.2rem;">
+        <h4 style="margin-bottom:.5rem;">Description</h4>
+        <p style="font-size:.92rem;color:#444;line-height:1.7;">{{ propriete.description }}</p>
+      </div>
+
+      <!-- ACTIONS CLIENT -->
+      {% if user.is_authenticated and user.est_client %}
+        <div style="margin-top:1.5rem;display:flex;gap:.8rem;flex-wrap:wrap;">
+          <a href="{% url 'toggle_favori' propriete.pk %}"
+             class="btn {% if est_favori %}btn-rouge{% else %}btn-or{% endif %}">
+            {% if est_favori %}💔 Retirer des favoris{% else %}❤️ Ajouter aux favoris{% endif %}
+          </a>
+          {% if not deja_demande %}
+            <a href="{% url 'demander_visite' propriete.pk %}" class="btn btn-vert">📅 Demander une visite</a>
+          {% else %}
+            <span class="btn btn-gris">✔ Visite déjà demandée</span>
+          {% endif %}
+        </div>
+      {% elif not user.is_authenticated %}
+        <div style="margin-top:1.2rem;padding:1rem;background:#f0faf4;border-radius:6px;">
+          <p style="font-size:.9rem;">
+            <a href="{% url 'connexion' %}">Connectez-vous</a> ou
+            <a href="{% url 'inscription' %}">inscrivez-vous</a> pour contacter le propriétaire ou demander une visite.
+          </p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Annonces à valider{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="section-titre">
+    <h3>📋 Annonces en attente de validation ({{ annonces|length }})</h3>
+    <a href="{% url 'agent_dashboard' %}" class="btn btn-gris btn-sm">← Retour</a>
+  </div>
+  {% if annonces %}
+  <div class="grid-proprietes">
+    {% for p in annonces %}
+    <div class="card-propriete">
+      <div class="img-wrap">
+        {% if p.photo_principale %}<img src="{{ p.photo_principale.image.url }}" alt="{{ p.titre }}">
+        {% else %}<div class="img-placeholder">🏠</div>{% endif %}
+        <span class="badge-option">En attente</span>
+      </div>
+      <div class="card-body">
+        <h3>{{ p.titre }}</h3>
+        <p class="zone">{{ p.zone_geographique }}</p>
+        <p class="prix">{{ p.prix|floatformat:0 }} FCFA</p>
+        <div class="tags">
+          <span class="tag">{{ p.get_type_bien_display }}</span>
+          <span class="tag">{{ p.get_option_display }}</span>
+        </div>
+        <p style="font-size:.82rem;color:#555;margin-bottom:.5rem;">
+          Bailleur : {{ p.bailleur.nom_complet }}<br>
+          Déposé le {{ p.date_creation|date:"d/m/Y" }}
+        </p>
+        <form method="post" action="{% url 'agent_valider' p.pk %}">
+          {% csrf_token %}
+          <div style="display:flex;gap:.5rem;">
+            <button name="action" value="valider" class="btn btn-vert btn-sm" onclick="return confirm('Valider et publier cette annonce ?')">✅ Valider</button>
+            <button name="action" value="refuser" class="btn btn-rouge btn-sm" onclick="return confirm('Refuser cette annonce ?')">❌ Refuser</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="vide"><div class="icon">✅</div><p>Aucune annonce en attente.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

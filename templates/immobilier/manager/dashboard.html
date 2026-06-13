@@ -1,0 +1,56 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Tableau de bord Manager{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <h2>📊 Tableau de bord Manager</h2>
+    <p>Vue d'ensemble de la plateforme IMMO-BF</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val">{{ stats.total_proprietes }}</div><div class="stat-label">Total propriétés</div></div>
+    <div class="stat-card or"><div class="stat-val">{{ stats.en_attente }}</div><div class="stat-label">En attente validation</div></div>
+    <div class="stat-card"><div class="stat-val">{{ stats.publiees }}</div><div class="stat-label">Publiées</div></div>
+    <div class="stat-card rouge"><div class="stat-val">{{ stats.visites_total }}</div><div class="stat-label">Visites demandées</div></div>
+    <div class="stat-card"><div class="stat-val">{{ stats.total_clients }}</div><div class="stat-label">Clients</div></div>
+    <div class="stat-card"><div class="stat-val">{{ stats.total_bailleurs }}</div><div class="stat-label">Bailleurs</div></div>
+    <div class="stat-card"><div class="stat-val">{{ stats.total_agents }}</div><div class="stat-label">Agents</div></div>
+  </div>
+
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;">
+    <a href="{% url 'manager_utilisateurs' %}" class="btn btn-vert">👥 Gérer les utilisateurs</a>
+    <a href="{% url 'manager_annonces' %}" class="btn btn-or">🏠 Gérer les annonces</a>
+    <a href="{% url 'manager_creer_utilisateur' %}" class="btn btn-gris">+ Créer un compte</a>
+  </div>
+
+  <!-- Répartition par type -->
+  {% if par_type %}
+  <div class="section-titre"><h3>📈 Propriétés par type</h3></div>
+  <div class="table-wrap" style="max-width:400px;margin-bottom:2rem;">
+    <table>
+      <thead><tr><th>Type</th><th>Nombre</th></tr></thead>
+      <tbody>
+        {% for t in par_type %}
+        <tr><td>{{ t.type_bien|capfirst }}</td><td><strong>{{ t.total }}</strong></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Visites par mois -->
+  {% if visites_par_mois %}
+  <div class="section-titre"><h3>📅 Visites demandées par mois</h3></div>
+  <div class="table-wrap" style="max-width:400px;">
+    <table>
+      <thead><tr><th>Mois</th><th>Visites</th></tr></thead>
+      <tbody>
+        {% for v in visites_par_mois %}
+        <tr><td>{{ v.mois|date:"M Y" }}</td><td><strong>{{ v.total }}</strong></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Gestion utilisateurs{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="section-titre">
+    <h3>👥 Tous les utilisateurs ({{ utilisateurs|length }})</h3>
+    <a href="{% url 'manager_creer_utilisateur' %}" class="btn btn-vert">+ Créer un compte</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Agent affecté</th><th>Actif</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for u in utilisateurs %}
+        <tr>
+          <td>{{ u.nom_complet }}</td>
+          <td>{{ u.email }}</td>
+          <td><span class="badge badge-publiee">{{ u.get_role_display }}</span></td>
+          <td>{{ u.agent_affecte.nom_complet|default:"—" }}</td>
+          <td>{% if u.is_active %}✅{% else %}❌{% endif %}</td>
+          <td>
+            <div class="actions">
+              <a href="{% url 'manager_modifier_utilisateur' u.pk %}" class="btn btn-or btn-sm">✏️</a>
+              {% if u.role == 'client' %}
+                <a href="{% url 'manager_affecter_client' u.pk %}" class="btn btn-vert btn-sm">👤</a>
+              {% endif %}
+              {% if u.pk != user.pk %}
+              <form method="post" action="{% url 'manager_supprimer_utilisateur' u.pk %}" style="display:inline;"
+                    onsubmit="return confirm('Supprimer cet utilisateur ?')">
+                {% csrf_token %}<button type="submit" class="btn btn-rouge btn-sm">🗑️</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

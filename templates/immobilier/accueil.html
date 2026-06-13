@@ -1,0 +1,69 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <h1>🏠 Bienvenue sur IMMO-BF</h1>
+  <p>Trouvez votre propriété idéale au Burkina Faso — Location & Vente</p>
+</div>
+
+<div class="container">
+
+  <!-- FILTRE -->
+  <form method="get" action="{% url 'accueil' %}">
+    <div class="filtre-bar">
+      {% for field in filtre_form %}
+        <div>{{ field }}</div>
+      {% endfor %}
+      <button type="submit" class="btn btn-vert">🔍 Filtrer</button>
+      <a href="{% url 'accueil' %}" class="btn btn-gris">Réinitialiser</a>
+    </div>
+  </form>
+
+  <!-- DERNIÈRES ANNONCES -->
+  {% if dernieres %}
+  <div class="section">
+    <div class="section-titre"><h3>🆕 Dernières annonces</h3></div>
+    <div class="grid-proprietes">
+      {% for p in dernieres %}
+        {% include 'immobilier/_card_propriete.html' with propriete=p %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- TOUTES LES PROPRIETES -->
+  <div class="section">
+    <div class="section-titre">
+      <h3>Toutes les propriétés ({{ proprietes.paginator.count }})</h3>
+    </div>
+
+    {% if proprietes %}
+      <div class="grid-proprietes">
+        {% for p in proprietes %}
+          {% include 'immobilier/_card_propriete.html' with propriete=p %}
+        {% endfor %}
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="pagination">
+        {% if proprietes.has_previous %}
+          <a href="?page={{ proprietes.previous_page_number }}">‹ Précédent</a>
+        {% endif %}
+        <span class="current">Page {{ proprietes.number }} / {{ proprietes.paginator.num_pages }}</span>
+        {% if proprietes.has_next %}
+          <a href="?page={{ proprietes.next_page_number }}">Suivant ›</a>
+        {% endif %}
+      </div>
+
+    {% else %}
+      <div class="vide">
+        <div class="icon">🏘️</div>
+        <p>Aucune propriété ne correspond à vos critères.</p>
+        <a href="{% url 'accueil' %}" class="btn btn-vert" style="margin-top:1rem;">Voir tout</a>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

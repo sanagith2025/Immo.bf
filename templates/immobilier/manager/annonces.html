@@ -1,0 +1,35 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Toutes les annonces{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="section-titre">
+    <h3>🏠 Toutes les annonces ({{ annonces|length }})</h3>
+    <a href="{% url 'manager_dashboard' %}" class="btn btn-gris btn-sm">← Tableau de bord</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Titre</th><th>Bailleur</th><th>Type</th><th>Option</th><th>Prix</th><th>Statut</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for p in annonces %}
+        <tr>
+          <td><strong>{{ p.titre }}</strong><br><small>{{ p.zone_geographique }}</small></td>
+          <td>{{ p.bailleur.nom_complet }}</td>
+          <td>{{ p.get_type_bien_display }}</td>
+          <td>{{ p.get_option_display }}</td>
+          <td>{{ p.prix|floatformat:0 }} FCFA</td>
+          <td><span class="badge badge-{{ p.statut }}">{{ p.get_statut_display }}</span></td>
+          <td>
+            {% if p.statut == 'publiee' %}
+            <form method="post" action="{% url 'manager_retirer_annonce' p.pk %}" style="display:inline;"
+                  onsubmit="return confirm('Retirer cette annonce ?')">
+              {% csrf_token %}<button type="submit" class="btn btn-rouge btn-sm">Retirer</button>
+            </form>
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

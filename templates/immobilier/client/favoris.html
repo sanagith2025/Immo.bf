@@ -1,0 +1,21 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Mes favoris{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="section-titre">
+    <h3>❤️ Mes favoris ({{ favoris|length }})</h3>
+    <a href="{% url 'accueil' %}" class="btn btn-vert">+ Ajouter des propriétés</a>
+  </div>
+  {% if favoris %}
+  <div class="grid-proprietes">
+    {% for fav in favoris %}
+      {% include 'immobilier/_card_propriete.html' with propriete=fav.propriete %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="vide"><div class="icon">❤️</div><p>Aucun favori pour l'instant.</p>
+    <a href="{% url 'accueil' %}" class="btn btn-vert" style="margin-top:1rem;">Parcourir les annonces</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

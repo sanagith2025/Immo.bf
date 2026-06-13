@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}IMMO-BF{% endblock %} | Gestion Immobilière</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="{% url 'accueil' %}" class="logo">IMMO<span>-BF</span></a>
+  <div class="nav-links">
+    <a href="{% url 'accueil' %}" class="lien-texte">Accueil</a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'tableau_bord' %}">Mon espace</a>
+      <a href="{% url 'deconnexion' %}" class="btn-nav btn">Déconnexion</a>
+    {% else %}
+      <a href="{% url 'connexion' %}" class="lien-texte">Connexion</a>
+      <a href="{% url 'inscription' %}" class="btn-nav btn">S'inscrire</a>
+    {% endif %}
+  </div>
+</nav>
+
+<main>
+  {% if messages %}
+  <div class="container" style="padding-top:1rem;">
+    <ul class="messages-list">
+      {% for msg in messages %}
+        <li class="{{ msg.tags }}">{{ msg }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<footer>
+  <p>© 2026 <span>IMMO-BF</span> — Plateforme de Gestion Immobilière — Burkina Faso</p>
+  <p>Projet Intégrateur L2IT — Université Aube Nouvelle</p>
+</footer>
+
+</body>
+</html>

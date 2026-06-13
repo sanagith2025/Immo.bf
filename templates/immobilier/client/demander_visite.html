@@ -1,0 +1,22 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Demander une visite{% endblock %}
+{% block content %}
+<div class="container section">
+<div class="form-card">
+  <h2>📅 Demander une visite</h2>
+  <div style="background:#f0faf4;padding:1rem;border-radius:6px;margin-bottom:1.5rem;">
+    <strong>{{ propriete.titre }}</strong><br>
+    <small>{{ propriete.zone_geographique }} — {{ propriete.prix|floatformat:0 }} FCFA</small>
+  </div>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group"><label>{{ form.date_souhaitee.label }}</label>{{ form.date_souhaitee }}</div>
+    <div class="form-group"><label>{{ form.message.label }}</label>{{ form.message }}</div>
+    <div style="display:flex;gap:1rem;">
+      <button type="submit" class="btn btn-vert">Envoyer la demande</button>
+      <a href="{% url 'detail_propriete' propriete.pk %}" class="btn btn-gris">Annuler</a>
+    </div>
+  </form>
+</div>
+</div>
+{% endblock %}

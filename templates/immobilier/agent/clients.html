@@ -1,0 +1,26 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Mes clients{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="section-titre"><h3>👥 Mes clients affectés ({{ clients|length }})</h3></div>
+  {% if clients %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Inscrit le</th></tr></thead>
+      <tbody>
+        {% for c in clients %}
+        <tr>
+          <td>{{ c.nom_complet }}</td>
+          <td>{{ c.email }}</td>
+          <td>{{ c.telephone|default:"—" }}</td>
+          <td>{{ c.date_inscription|date:"d/m/Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="vide"><div class="icon">👥</div><p>Aucun client affecté.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

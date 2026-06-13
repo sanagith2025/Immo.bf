@@ -1,0 +1,55 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Inscription{% endblock %}
+
+{% block content %}
+<div class="container">
+<div class="form-card" style="max-width:560px;">
+  <h2>🏠 Créer un compte</h2>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.prenom.label }}</label>
+        {{ form.prenom }}
+        {% if form.prenom.errors %}<p class="form-erreur">{{ form.prenom.errors.0 }}</p>{% endif %}
+      </div>
+      <div class="form-group">
+        <label>{{ form.nom.label }}</label>
+        {{ form.nom }}
+        {% if form.nom.errors %}<p class="form-erreur">{{ form.nom.errors.0 }}</p>{% endif %}
+      </div>
+    </div>
+    <div class="form-group">
+      <label>{{ form.email.label }}</label>
+      {{ form.email }}
+      {% if form.email.errors %}<p class="form-erreur">{{ form.email.errors.0 }}</p>{% endif %}
+    </div>
+    <div class="form-group">
+      <label>{{ form.telephone.label }}</label>
+      {{ form.telephone }}
+    </div>
+    <div class="form-group">
+      <label>{{ form.role.label }}</label>
+      {{ form.role }}
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>{{ form.password1.label }}</label>
+        {{ form.password1 }}
+        {% if form.password1.errors %}<p class="form-erreur">{{ form.password1.errors.0 }}</p>{% endif %}
+      </div>
+      <div class="form-group">
+        <label>{{ form.password2.label }}</label>
+        {{ form.password2 }}
+        {% if form.password2.errors %}<p class="form-erreur">{{ form.password2.errors.0 }}</p>{% endif %}
+      </div>
+    </div>
+    {% if form.non_field_errors %}
+      <p class="form-erreur">{{ form.non_field_errors.0 }}</p>
+    {% endif %}
+    <button type="submit" class="btn btn-vert btn-full">Créer mon compte</button>
+    <p class="lien-bas">Déjà un compte ? <a href="{% url 'connexion' %}">Se connecter</a></p>
+  </form>
+</div>
+</div>
+{% endblock %}

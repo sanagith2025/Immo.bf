@@ -1,0 +1,21 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Espace Agent{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <h2>🏢 Espace Agent</h2>
+    <p>Bienvenue {{ user.nom_complet }}</p>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card or"><div class="stat-val">{{ annonces_attente }}</div><div class="stat-label">Annonces à valider</div></div>
+    <div class="stat-card"><div class="stat-val">{{ clients|length }}</div><div class="stat-label">Mes clients</div></div>
+    <div class="stat-card rouge"><div class="stat-val">{{ visites_en_attente }}</div><div class="stat-label">Visites en attente</div></div>
+  </div>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+    <a href="{% url 'agent_annonces_attente' %}" class="btn btn-or">📋 Valider des annonces</a>
+    <a href="{% url 'agent_visites' %}" class="btn btn-vert">📅 Gérer les visites</a>
+    <a href="{% url 'agent_clients' %}" class="btn btn-gris">👥 Mes clients</a>
+    <a href="{% url 'agent_ajouter_propriete' %}" class="btn btn-vert">+ Annonce agence</a>
+  </div>
+</div>
+{% endblock %}

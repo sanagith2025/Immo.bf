@@ -1,0 +1,37 @@
+{% extends 'immobilier/base.html' %}
+{% block title %}Espace Client{% endblock %}
+{% block content %}
+<div class="container section">
+  <div class="dash-header">
+    <h2>👤 Espace Client</h2>
+    <p>Bienvenue {{ user.nom_complet }}{% if user.agent_affecte %} — Votre agent : {{ user.agent_affecte.nom_complet }}{% endif %}</p>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-val">{{ favoris_count }}</div><div class="stat-label">Favoris</div></div>
+    <div class="stat-card or"><div class="stat-val">{{ visites_count }}</div><div class="stat-label">Demandes de visite</div></div>
+  </div>
+  <div style="display:flex;gap:1rem;margin-bottom:2rem;flex-wrap:wrap;">
+    <a href="{% url 'accueil' %}" class="btn btn-vert">🔍 Chercher des propriétés</a>
+    <a href="{% url 'client_favoris' %}" class="btn btn-or">❤️ Mes favoris</a>
+    <a href="{% url 'client_demandes' %}" class="btn btn-gris">📅 Mes visites</a>
+  </div>
+  {% if visites_recentes %}
+  <div class="section-titre"><h3>Dernières demandes de visite</h3></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Propriété</th><th>Date souhaitée</th><th>Statut</th><th>Commentaire</th></tr></thead>
+      <tbody>
+        {% for d in visites_recentes %}
+        <tr>
+          <td><a href="{% url 'detail_propriete' d.propriete.pk %}">{{ d.propriete.titre }}</a></td>
+          <td>{{ d.date_souhaitee|default:"Non précisée" }}</td>
+          <td><span class="badge badge-{{ d.statut }}">{{ d.get_statut_display }}</span></td>
+          <td>{{ d.commentaire_agent|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
