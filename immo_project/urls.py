@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import path
 from django.http import HttpResponse
-from immobilier.models import Utilisateur  # AJOUTÉ
 
 def home(request):
     return HttpResponse("""
@@ -13,25 +12,40 @@ def home(request):
 def health_check(request):
     return HttpResponse("OK")
 
-# AJOUTÉ - Fonction pour créer un superutilisateur
-def create_admin(request):
-    email = "admin@immo.bf"
-    password = "admin123"
-    
-    if not Utilisateur.objects.filter(email=email).exists():
-        Utilisateur.objects.create_superuser(
-            email=email, 
-            password=password, 
-            nom='Admin', 
-            prenom='Super'
-        )
-        return HttpResponse(f"✅ Superutilisateur {email} créé avec succès !<br><a href='/admin/'>Se connecter à l'admin</a>")
-    else:
-        return HttpResponse(f"⚠️ L'utilisateur {email} existe déjà.<br><a href='/admin/'>Se connecter à l'admin</a>")
+def setup_admin(request):
+    """Fonction autonome pour créer l'administrateur"""
+    try:
+        from immobilier.models import Utilisateur
+        email = "admin@immo.bf"
+        password = "admin123"
+        
+        if not Utilisateur.objects.filter(email=email).exists():
+            Utilisateur.objects.create_superuser(
+                email=email,
+                password=password,
+                nom='Admin',
+                prenom='Super'
+            )
+            return HttpResponse("""
+                <h2 style="color:green;">✅ Admin créé avec succès !</h2>
+                <p>Email: <strong>admin@immo.bf</strong></p>
+                <p>Mot de passe: <strong>admin123</strong></p>
+                <p><a href="/admin/">Se connecter</a></p>
+            """)
+        else:
+            return HttpResponse("""
+                <h2>⚠️ Admin existe déjà</h2>
+                <p><a href="/admin/">Se connecter</a></p>
+            """)
+    except Exception as e:
+        return HttpResponse(f"""
+            <h2 style="color:red;">❌ Erreur: {str(e)}</h2>
+            <p>Vérifiez que la table existe.</p>
+        """)
 
 urlpatterns = [
     path('', home),
     path('admin/', admin.site.urls),
     path('health-check/', health_check),
-    path('create-admin/', create_admin),  # AJOUTÉ - Route temporaire
+    path('setup/', setup_admin),  # Nouvelle route plus courte
 ]
