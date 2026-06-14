@@ -23,14 +23,12 @@ def setup_admin(request):
                 is_superuser=True
             )
             return HttpResponse("""
-                <!DOCTYPE html>
                 <html>
-                <head><meta charset='utf-8'><title>Setup</title></head>
+                <head><meta charset='utf-8'></head>
                 <body style='font-family:Arial;text-align:center;margin-top:100px;'>
                     <h2 style='color:green;'>✅ Manager créé avec succès !</h2>
-                    <p><strong>Email :</strong> manager@immobf.bf</p>
-                    <p><strong>Mot de passe :</strong> Admin@2026</p>
-                    <br>
+                    <p>Email : manager@immobf.bf</p>
+                    <p>Mot de passe : Admin@2026</p>
                     <a href='/connexion/' style='background:#1a7a4a;color:white;padding:10px 20px;border-radius:5px;text-decoration:none;'>
                         Se connecter
                     </a>
@@ -39,14 +37,12 @@ def setup_admin(request):
             """)
         else:
             return HttpResponse("""
-                <!DOCTYPE html>
                 <html>
-                <head><meta charset='utf-8'><title>Setup</title></head>
+                <head><meta charset='utf-8'></head>
                 <body style='font-family:Arial;text-align:center;margin-top:100px;'>
                     <h2 style='color:orange;'>⚠️ Manager existe déjà</h2>
-                    <p><strong>Email :</strong> manager@immobf.bf</p>
-                    <p><strong>Mot de passe :</strong> Admin@2026</p>
-                    <br>
+                    <p>Email : manager@immobf.bf</p>
+                    <p>Mot de passe : Admin@2026</p>
                     <a href='/connexion/' style='background:#1a7a4a;color:white;padding:10px 20px;border-radius:5px;text-decoration:none;'>
                         Se connecter
                     </a>
@@ -55,12 +51,10 @@ def setup_admin(request):
             """)
     except Exception as e:
         return HttpResponse(f"""
-            <!DOCTYPE html>
             <html>
-            <head><meta charset='utf-8'><title>Erreur</title></head>
+            <head><meta charset='utf-8'></head>
             <body style='font-family:Arial;text-align:center;margin-top:100px;'>
                 <h2 style='color:red;'>❌ Erreur : {str(e)}</h2>
-                <p>Vérifiez les logs Render.</p>
             </body>
             </html>
         """)
