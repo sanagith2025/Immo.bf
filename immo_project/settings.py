@@ -1,22 +1,16 @@
-from pathlib import Path
+"""
+Django settings for immo_project project.
+"""
+
 import os
-import dj_database_url
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ── SÉCURITÉ ──────────────────────────────────────────────
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-immo-bf-burkina-2026')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-ta-cle-par-defaut')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com').split(',')
 
-DEBUG = False
-
-ALLOWED_HOSTS = [
-    'immo-bf.onrender.com',
-    'localhost',
-    '127.0.0.1',
-    '.onrender.com',
-]
-
-# ── APPLICATIONS ──────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -24,10 +18,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'immobilier',
+    # Tes applications personnalisées ici
 ]
 
-# ── MIDDLEWARE ────────────────────────────────────────────
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -41,11 +34,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'immo_project.urls'
 
-# ── TEMPLATES ─────────────────────────────────────────────
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -60,19 +52,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'immo_project.wsgi.application'
 
-# ── BASE DE DONNÉES POSTGRESQL ────────────────────────────
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('PGDATABASE', ''),
+        'USER': os.environ.get('PGUSER', ''),
+        'PASSWORD': os.environ.get('PGPASSWORD', ''),
+        'HOST': os.environ.get('PGHOST', ''),
+        'PORT': os.environ.get('PGPORT', '5432'),
+    }
 }
 
-# ── MODÈLE UTILISATEUR PERSONNALISÉ ──────────────────────
-AUTH_USER_MODEL = 'immobilier.Utilisateur'
-
-# ── VALIDATION MOTS DE PASSE ──────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -80,26 +70,28 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ── LANGUE & FUSEAU HORAIRE ───────────────────────────────
 LANGUAGE_CODE = 'fr-fr'
-TIME_ZONE = 'Africa/Ouagadougou'
+TIME_ZONE = 'Europe/Paris'
 USE_I18N = True
 USE_TZ = True
 
-# ── FICHIERS STATIQUES ────────────────────────────────────
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ── FICHIERS MEDIA ────────────────────────────────────────
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
-# ── AUTHENTIFICATION ──────────────────────────────────────
-LOGIN_URL = '/connexion/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
-
-# ── CLÉ PRIMAIRE ──────────────────────────────────────────
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ============================================================
+# CLOUDINARY CONFIGURATION (Stockage permanent des images)
+# ============================================================
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+
+INSTALLED_APPS += ['cloudinary_storage', 'cloudinary']
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
