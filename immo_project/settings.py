@@ -3,14 +3,22 @@ Django settings for immo_project project.
 """
 
 import os
+import dj_database_url
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-ta-cle-par-defaut')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com').split(',')
+# ── SÉCURITÉ ──────────────────────────────────────────────
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-immo-bf-burkina-2026')
+DEBUG = False
+ALLOWED_HOSTS = [
+    'immo-bf.onrender.com',
+    'localhost',
+    '127.0.0.1',
+    '.onrender.com',
+]
 
+# ── APPLICATIONS ──────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -18,9 +26,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Tes applications personnalisées ici
+    'immobilier',
 ]
 
+# ── MIDDLEWARE ────────────────────────────────────────────
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -34,10 +43,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'immo_project.urls'
 
+# ── TEMPLATES ─────────────────────────────────────────────
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -52,17 +62,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'immo_project.wsgi.application'
 
+# ── BASE DE DONNÉES POSTGRESQL ────────────────────────────
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('PGDATABASE', ''),
-        'USER': os.environ.get('PGUSER', ''),
-        'PASSWORD': os.environ.get('PGPASSWORD', ''),
-        'HOST': os.environ.get('PGHOST', ''),
-        'PORT': os.environ.get('PGPORT', '5432'),
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
+# ── MODÈLE UTILISATEUR PERSONNALISÉ ──────────────────────
+AUTH_USER_MODEL = 'immobilier.Utilisateur'
+
+# ── VALIDATION MOTS DE PASSE ──────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -70,17 +82,28 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# ── LANGUE & FUSEAU HORAIRE ───────────────────────────────
 LANGUAGE_CODE = 'fr-fr'
-TIME_ZONE = 'Europe/Paris'
+TIME_ZONE = 'Africa/Ouagadougou'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# ── FICHIERS STATIQUES ────────────────────────────────────
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# ── FICHIERS MEDIA ────────────────────────────────────────
 MEDIA_URL = '/media/'
+# Plus besoin de MEDIA_ROOT car Cloudinary gère le stockage
 
+# ── AUTHENTIFICATION ──────────────────────────────────────
+LOGIN_URL = '/connexion/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# ── CLÉ PRIMAIRE ──────────────────────────────────────────
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ============================================================
