@@ -1,12 +1,11 @@
 from pathlib import Path
 import os
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ── SÉCURITÉ ──────────────────────────────────────────────
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
-if not SECRET_KEY:
-    raise ValueError("DJANGO_SECRET_KEY non définie dans les variables d'environnement !")
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-immo-bf-burkina-2026')
 
 DEBUG = False
 
@@ -61,12 +60,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'immo_project.wsgi.application'
 
-# ── BASE DE DONNÉES ───────────────────────────────────────
+# ── BASE DE DONNÉES POSTGRESQL ────────────────────────────
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
 
 # ── MODÈLE UTILISATEUR PERSONNALISÉ ──────────────────────
@@ -100,14 +100,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = '/connexion/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-
-# ── SÉCURITÉ HTTPS ────────────────────────────────────────
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
 
 # ── CLÉ PRIMAIRE ──────────────────────────────────────────
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
