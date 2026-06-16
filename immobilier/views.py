@@ -20,10 +20,8 @@ from .decorators import client_required, bailleur_required, agent_required, mana
 # ─────────────────────────────────────────
 
 def accueil(request):
-    """Page d'accueil : propriétés publiées par catégorie + dernières annonces."""
     proprietes = Propriete.objects.filter(statut='publiee').select_related('bailleur').prefetch_related('photos')
-    
-    # Filtre
+
     filtre_form = FiltreProprietesForm(request.GET)
     if filtre_form.is_valid():
         d = filtre_form.cleaned_data
@@ -37,8 +35,6 @@ def accueil(request):
             proprietes = proprietes.filter(zone_geographique__icontains=d['zone'])
 
     dernieres = Propriete.objects.filter(statut='publiee').order_by('-date_creation')[:6]
-    locations = proprietes.filter(option='location')[:4]
-    ventes = proprietes.filter(option='vente')[:4]
 
     paginator = Paginator(proprietes, 9)
     page = request.GET.get('page', 1)
@@ -47,14 +43,11 @@ def accueil(request):
     return render(request, 'immobilier/accueil.html', {
         'proprietes': proprietes_page,
         'dernieres': dernieres,
-        'locations': locations,
-        'ventes': ventes,
         'filtre_form': filtre_form,
     })
 
 
 def detail_propriete(request, pk):
-    """Fiche détaillée d'une propriété (sans coordonnées bailleur pour visiteurs)."""
     propriete = get_object_or_404(Propriete, pk=pk, statut='publiee')
     est_favori = False
     deja_demande = False
@@ -113,7 +106,6 @@ def deconnexion(request):
 
 @login_required
 def tableau_bord(request):
-    """Redirige vers le bon tableau de bord selon le rôle."""
     role = request.user.role
     if role == 'client':
         return redirect('client_dashboard')
@@ -163,15 +155,18 @@ def toggle_favori(request, pk):
 
 @client_required
 def client_demandes(request):
-    demandes = DemandeVisite.objects.filter(client=request.user).select_related('propriete', 'agent')
+    demandes = DemandeVisite.objects.filter(
+        client=request.user
+    ).select_related('propriete', 'agent')
     return render(request, 'immobilier/client/demandes.html', {'demandes': demandes})
 
 
 @client_required
 def demander_visite(request, pk):
     propriete = get_object_or_404(Propriete, pk=pk, statut='publiee')
+
     if DemandeVisite.objects.filter(client=request.user, propriete=propriete).exists():
-        messages.warning(request, "Vous avez déjà une demande de visite pour cette propriété.")
+        messages.warning(request, "Vous avez déjà une demande pour cette propriété.")
         return redirect('detail_propriete', pk=pk)
 
     if request.method == 'POST':
@@ -180,15 +175,26 @@ def demander_visite(request, pk):
             demande = form.save(commit=False)
             demande.client = request.user
             demande.propriete = propriete
-            # Affecter l'agent du client si disponible
-            demande.agent = request.user.agent_affecte
+
+            # Affecter l'agent du client automatiquement
+            if request.user.agent_affecte:
+                demande.agent = request.user.agent_affecte
+            else:
+                # Si pas d'agent affecté, prendre le premier agent disponible
+                agent = Utilisateur.objects.filter(
+                    role='agent', is_active=True
+                ).first()
+                demande.agent = agent
+
             demande.save()
             messages.success(request, "Votre demande de visite a été envoyée.")
             return redirect('client_demandes')
     else:
         form = DemandeVisiteForm()
+
     return render(request, 'immobilier/client/demander_visite.html', {
-        'form': form, 'propriete': propriete
+        'form': form,
+        'propriete': propriete
     })
 
 
@@ -232,7 +238,9 @@ def bailleur_ajouter_propriete(request):
         form = ProprieteForm()
         photo_form = PhotoForm()
     return render(request, 'immobilier/bailleur/formulaire_propriete.html', {
-        'form': form, 'photo_form': photo_form, 'titre': 'Déposer une annonce'
+        'form': form,
+        'photo_form': photo_form,
+        'titre': 'Déposer une annonce'
     })
 
 
@@ -254,7 +262,10 @@ def bailleur_modifier_propriete(request, pk):
         form = ProprieteForm(instance=propriete)
         photo_form = PhotoForm()
     return render(request, 'immobilier/bailleur/formulaire_propriete.html', {
-        'form': form, 'photo_form': photo_form, 'titre': 'Modifier l\'annonce', 'propriete': propriete
+        'form': form,
+        'photo_form': photo_form,
+        'titre': "Modifier l'annonce",
+        'propriete': propriete
     })
 
 
@@ -275,8 +286,12 @@ def bailleur_supprimer_propriete(request, pk):
 def agent_dashboard(request):
     agent = request.user
     annonces_attente = Propriete.objects.filter(statut='en_attente').count()
+    # Clients affectés à cet agent
     clients = Utilisateur.objects.filter(agent_affecte=agent)
-    visites = DemandeVisite.objects.filter(agent=agent, statut='en_attente').count()
+    # Visites en attente affectées à cet agent
+    visites = DemandeVisite.objects.filter(
+        agent=agent, statut='en_attente'
+    ).count()
     return render(request, 'immobilier/agent/dashboard.html', {
         'annonces_attente': annonces_attente,
         'clients': clients,
@@ -286,7 +301,9 @@ def agent_dashboard(request):
 
 @agent_required
 def agent_annonces_attente(request):
-    annonces = Propriete.objects.filter(statut='en_attente').select_related('bailleur').prefetch_related('photos')
+    annonces = Propriete.objects.filter(
+        statut='en_attente'
+    ).select_related('bailleur').prefetch_related('photos')
     return render(request, 'immobilier/agent/annonces_attente.html', {'annonces': annonces})
 
 
@@ -309,20 +326,23 @@ def agent_valider_annonce(request, pk):
 
 @agent_required
 def agent_clients(request):
+    # L'agent ne voit que ses propres clients
     clients = Utilisateur.objects.filter(agent_affecte=request.user)
     return render(request, 'immobilier/agent/clients.html', {'clients': clients})
 
 
 @agent_required
 def agent_visites(request):
+    # L'agent ne voit que les visites des clients qui lui sont affectés
     visites = DemandeVisite.objects.filter(
         agent=request.user
-    ).select_related('client', 'propriete')
+    ).select_related('client', 'propriete').order_by('-date_demande')
     return render(request, 'immobilier/agent/visites.html', {'visites': visites})
 
 
 @agent_required
 def agent_traiter_visite(request, pk):
+    # L'agent ne peut traiter que les visites qui lui sont affectées
     visite = get_object_or_404(DemandeVisite, pk=pk, agent=request.user)
     if request.method == 'POST':
         form = TraiterDemandeForm(request.POST, instance=visite)
@@ -334,12 +354,14 @@ def agent_traiter_visite(request, pk):
             return redirect('agent_visites')
     else:
         form = TraiterDemandeForm(instance=visite)
-    return render(request, 'immobilier/agent/traiter_visite.html', {'form': form, 'visite': visite})
+    return render(request, 'immobilier/agent/traiter_visite.html', {
+        'form': form,
+        'visite': visite
+    })
 
 
 @agent_required
 def agent_ajouter_propriete(request):
-    """Agent peut ajouter une propriété d'agence sans validation."""
     if request.method == 'POST':
         form = ProprieteForm(request.POST)
         photo_form = PhotoForm(request.POST, request.FILES)
@@ -360,7 +382,9 @@ def agent_ajouter_propriete(request):
         form = ProprieteForm()
         photo_form = PhotoForm()
     return render(request, 'immobilier/bailleur/formulaire_propriete.html', {
-        'form': form, 'photo_form': photo_form, 'titre': "Ajouter une propriété d'agence"
+        'form': form,
+        'photo_form': photo_form,
+        'titre': "Ajouter une propriété d'agence"
     })
 
 
@@ -371,7 +395,7 @@ def agent_ajouter_propriete(request):
 @manager_required
 def manager_dashboard(request):
     from django.db.models.functions import TruncMonth
-    
+
     stats = {
         'total_proprietes': Propriete.objects.count(),
         'en_attente': Propriete.objects.filter(statut='en_attente').count(),
@@ -382,7 +406,6 @@ def manager_dashboard(request):
         'visites_total': DemandeVisite.objects.count(),
     }
 
-    # Visites par mois (6 derniers mois)
     visites_par_mois = (
         DemandeVisite.objects
         .annotate(mois=TruncMonth('date_demande'))
@@ -391,7 +414,6 @@ def manager_dashboard(request):
         .order_by('mois')[:6]
     )
 
-    # Propriétés par type
     par_type = (
         Propriete.objects
         .values('type_bien')
@@ -408,7 +430,9 @@ def manager_dashboard(request):
 @manager_required
 def manager_utilisateurs(request):
     utilisateurs = Utilisateur.objects.all().order_by('role', 'nom')
-    return render(request, 'immobilier/manager/utilisateurs.html', {'utilisateurs': utilisateurs})
+    return render(request, 'immobilier/manager/utilisateurs.html', {
+        'utilisateurs': utilisateurs
+    })
 
 
 @manager_required
@@ -422,7 +446,8 @@ def manager_creer_utilisateur(request):
     else:
         form = UtilisateurAdminForm()
     return render(request, 'immobilier/manager/form_utilisateur.html', {
-        'form': form, 'titre': 'Créer un utilisateur'
+        'form': form,
+        'titre': 'Créer un utilisateur'
     })
 
 
@@ -438,7 +463,9 @@ def manager_modifier_utilisateur(request, pk):
     else:
         form = UtilisateurAdminForm(instance=user)
     return render(request, 'immobilier/manager/form_utilisateur.html', {
-        'form': form, 'titre': 'Modifier l\'utilisateur', 'utilisateur': user
+        'form': form,
+        'titre': "Modifier l'utilisateur",
+        'utilisateur': user
     })
 
 
@@ -460,13 +487,18 @@ def manager_affecter_client(request, pk):
         if agent_id:
             agent = get_object_or_404(Utilisateur, pk=agent_id, role='agent')
             client.agent_affecte = agent
+            # Mettre à jour toutes les demandes de visite en attente du client
+            DemandeVisite.objects.filter(
+                client=client, statut='en_attente'
+            ).update(agent=agent)
         else:
             client.agent_affecte = None
         client.save()
         messages.success(request, f"{client.nom_complet} affecté(e) à l'agent.")
         return redirect('manager_utilisateurs')
     return render(request, 'immobilier/manager/affecter_client.html', {
-        'client': client, 'agents': agents
+        'client': client,
+        'agents': agents
     })
 
 
@@ -482,5 +514,7 @@ def manager_retirer_annonce(request, pk):
 
 @manager_required
 def manager_annonces(request):
-    annonces = Propriete.objects.all().select_related('bailleur', 'agent_validateur')
+    annonces = Propriete.objects.all().select_related(
+        'bailleur', 'agent_validateur'
+    )
     return render(request, 'immobilier/manager/annonces.html', {'annonces': annonces})
